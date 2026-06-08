@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>RADHIKA TRADER - Market Intelligence</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;600;700;900&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --green: #00ff88;
+      --green-dim: #00c466;
+      --red: #ff3355;
+      --blue: #00aaff;
+      --gold: #ffcc00;
+
+      --bg: #080c10;
+      --bg2: #0d1318;
+      --bg3: #111820;
+
+      --border: rgba(0, 255, 136, 0.12);
+      --border2: rgba(255, 255, 255, 0.06);
+
+      --text: #e8eef4;
+      --muted: rgba(232, 238, 244, 0.45);
+
+      --font-mono: "Share Tech Mono", monospace;
+      --font-display: "Orbitron", sans-serif;
+      --font-body: "DM Sans", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.05) 2px,
+        rgba(0, 0, 0, 0.05) 4px
+      );
+
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+
+      background-image:
+        linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+
+      background-size: 40px 40px;
+      z-index: 0;
+    }
+
+    /* =========================
+       TICKER
+    ========================= */
+
+    .ticker-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      height: 34px;
+
+      background: #08110c;
+
+      border-bottom: 1px solid var(--border);
+
+      overflow: hidden;
+
+      z-index: 100;
+
+      display: flex;
+      align-items: center;
+    }
+
+    .ticker-inner {
+      display: flex;
+      white-space: nowrap;
+
+      animation: tickerMove 30s linear infinite;
+    }
+
+    @keyframes tickerMove {
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
+    }
+
+    .ticker-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      padding: 0 22px;
+
+      border-right: 1px solid rgba(0, 255, 136, 0.08);
+
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .ticker-sym {
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .ticker-val {
+      color: var(--green);
+    }
+
+    .ticker-val.down {
+      color: var(--red);
+    }
+
+    .ticker-chg {
+      opacity: 0.7;
+    }
+
+    /* =========================
+       STATUS BAR
+    ========================= */
+
+    .status-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      height: 26px;
+
+      background: #08110c;
+
+      border-top: 1px solid var(--border);
+
+      z-index: 100;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 16px;
+    }
+
+    .status-bar span {
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+
+    .online {
+      color: var(--green);
+    }
+
+    /* =========================
+       BG CHART
+    ========================= */
+
+    .chart-bg {
+      position: fixed;
+      inset: auto 0 26px 0;
+
+      height: 220px;
+
+      opacity: 0.1;
+
+      z-index: 0;
+
+      pointer-events: none;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main {
+      position: relative;
+      z-index: 1;
+
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 60px 16px 50px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+    }
+
+    /* =========================
+       PANEL
+    ========================= */
+
+    .panel {
+      position: relative;
+
+      background: var(--bg2);
+
+      border: 1px solid var(--border);
+
+      border-radius: 6px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 0 30px rgba(0, 255, 136, 0.08),
+        inset 0 0 30px rgba(0, 255, 136, 0.02);
+    }
+
+    .panel::before {
+      content: "";
+
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+
+      height: 2px;
+
+      background: linear-gradient(
+        90deg,
+        var(--green),
+        var(--blue),
+        var(--green)
+      );
+
+      background-size: 200% 100%;
+
+      animation: gradientMove 3s linear infinite;
+    }
+
+    @keyframes gradientMove {
+      from {
+        background-position: 0% 0%;
+      }
+
+      to {
+        background-position: 200% 0%;
+      }
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 12px 16px;
+
+      background: #09150f;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      color: var(--green);
+
+      font-size: 11px;
+
+      letter-spacing: 2px;
+
+      font-family: var(--font-mono);
+    }
+
+    .panel-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-r {
+      background: var(--red);
+    }
+
+    .dot-y {
+      background: var(--gold);
+    }
+
+    .dot-g {
+      background: var(--green);
+    }
+
+    /* =========================
+       PROFILE
+    ========================= */
+
+    .profile-block {
+      padding: 20px;
+
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .profile-inner {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 78px;
+      height: 78px;
+
+      border-radius: 4px;
+
+      overflow: hidden;
+
+      flex-shrink: 0;
+
+      border: 1px solid var(--green);
+
+      background: #09150f;
+
+      position: relative;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      color: var(--green);
+
+      font-family: var(--font-mono);
+
+      font-size: 11px;
+
+      box-shadow:
+        0 0 20px rgba(0, 255, 136, 0.15),
+        inset 0 0 20px rgba(0, 255, 136, 0.05);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-corner {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+
+      width: 18px;
+      height: 18px;
+
+      border-top: 1px solid var(--green);
+      border-left: 1px solid var(--green);
+    }
+
+    .trader-name {
+      font-family: var(--font-display);
+
+      font-size: 20px;
+
+      font-weight: 900;
+
+      letter-spacing: 2px;
+
+      line-height: 1.1;
+
+      margin-bottom: 6px;
+    }
+
+    .trader-name span {
+      color: var(--green);
+    }
+
+    .trader-sub {
+      font-family: var(--font-mono);
+
+      color: var(--muted);
+
+      font-size: 10px;
+
+      letter-spacing: 1px;
+
+      margin-bottom: 10px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .tag {
+      padding: 4px 8px;
+
+      border-radius: 2px;
+
+      font-size: 9px;
+      font-weight: 700;
+
+      letter-spacing: 1px;
+
+      font-family: var(--font-mono);
+    }
+
+    .tag-green {
+      color: var(--green);
+
+      background: rgba(0, 255, 136, 0.1);
+
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .tag-blue {
+      color: var(--blue);
+
+      background: rgba(0, 170, 255, 0.1);
+
+      border: 1px solid rgba(0, 170, 255, 0.2);
+    }
+
+    .tag-red {
+      color: var(--red);
+
+      background: rgba(255, 51, 85, 0.1);
+
+      border: 1px solid rgba(255, 51, 85, 0.2);
+
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .blink-dot {
+      width: 5px;
+      height: 5px;
+
+      border-radius: 50%;
+
+      background: var(--red);
+
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0;
+      }
+    }
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .stat-cell {
+      text-align: center;
+
+      padding: 14px;
+
+      border-right: 1px solid var(--border2);
+    }
+
+    .stat-cell:last-child {
+      border-right: none;
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+
+      font-size: 18px;
+      font-weight: 700;
+
+      margin-bottom: 4px;
+
+      color: var(--green);
+    }
+
+    .stat-val.gold {
+      color: var(--gold);
+    }
+
+    .stat-label {
+      color: var(--muted);
+
+      font-size: 9px;
+
+      letter-spacing: 1px;
+
+      font-family: var(--font-mono);
+
+      text-transform: uppercase;
+    }
+
+    /* =========================
+       MINI CHART
+    ========================= */
+
+    .chart-section {
+      padding: 14px;
+
+      background: rgba(0, 0, 0, 0.2);
+
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .chart-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      margin-bottom: 12px;
+
+      font-size: 9px;
+
+      letter-spacing: 2px;
+
+      font-family: var(--font-mono);
+
+      color: var(--muted);
+    }
+
+    .chart-label .up {
+      color: var(--green);
+    }
+
+    .candle-chart {
+      height: 70px;
+
+      display: flex;
+      align-items: flex-end;
+
+      gap: 3px;
+    }
+
+    .candle {
+      flex: 1;
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .wick {
+      width: 1px;
+
+      background: currentColor;
+
+      opacity: 0.5;
+    }
+
+    .body {
+      width: 70%;
+
+      border-radius: 1px;
+    }
+
+    .candle.bull {
+      color: var(--green);
+    }
+
+    .candle.bear {
+      color: var(--red);
+    }
+
+    .candle.bull .body {
+      background: var(--green);
+    }
+
+    .candle.bear .body {
+      background: var(--red);
+    }
+
+    /* =========================
+       FEATURES
+    ========================= */
+
+    .features {
+      padding: 14px;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 8px;
+
+      border-bottom: 1px solid var(--border2);
+    }
+
+    .feat-row {
+      display: flex;
+      align-items: center;
+
+      gap: 12px;
+
+      background: var(--bg3);
+
+      border: 1px solid var(--border2);
+
+      padding: 12px;
+
+      border-radius: 4px;
+
+      transition: 0.25s;
+    }
+
+    .feat-row:hover {
+      transform: translateX(4px);
+
+      border-color: rgba(0, 255, 136, 0.25);
+
+      background: rgba(0, 255, 136, 0.04);
+    }
+
+    .feat-icon {
+      width: 38px;
+      height: 38px;
+
+      flex-shrink: 0;
+
+      border-radius: 4px;
+
+      border: 1px solid rgba(0, 255, 136, 0.2);
+
+      background: rgba(0, 255, 136, 0.05);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 18px;
+    }
+
+    .feat-text p {
+      font-size: 14px;
+      font-weight: 600;
+
+      margin-bottom: 2px;
+    }
+
+    .feat-text span {
+      font-size: 10px;
+
+      color: var(--muted);
+
+      font-family: var(--font-mono);
+    }
+
+    .feat-arrow {
+      margin-left: auto;
+
+      color: rgba(0, 255, 136, 0.35);
+
+      font-family: var(--font-mono);
+    }
+
+    /* =========================
+       CTA
+    ========================= */
+
+    .cta-block {
+      padding: 14px;
+    }
+
+    .cta-btn {
+      position: relative;
+
+      width: 100%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 10px;
+
+      text-decoration: none;
+
+      padding: 16px;
+
+      border-radius: 4px;
+
+      border: 1px solid var(--green);
+
+      overflow: hidden;
+
+      color: var(--green);
+
+      font-family: var(--font-display);
+
+      letter-spacing: 3px;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      transition: 0.3s;
+    }
+
+    .cta-btn::before {
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      background: var(--green);
+
+      transform: translateX(-100%);
+
+      transition: transform 0.3s ease;
+    }
+
+    .cta-btn:hover::before {
+      transform: translateX(0);
+    }
+
+    .cta-btn:hover {
+      color: #000;
+
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+    }
+
+    .cta-btn span,
+    .cta-btn svg {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cmd-prefix {
+      opacity: 0.6;
+
+      font-family: var(--font-mono);
+    }
+
+    .text-small {
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .footer-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 12px 14px;
+
+      background: #060a08;
+
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-bar p {
+      font-size: 9px;
+
+      font-family: var(--font-mono);
+
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .credit {
+      color: rgba(0, 255, 136, 0.4) !important;
+    }
+
+    /* =========================
+       ADS BANNER
+    ========================= */
+
+    .ads-banner-wrap {
+      display: flex;
+      justify-content: center;
+
+      margin-top: 14px;
+      margin-bottom: 12px;
+
+      position: relative;
+      z-index: 2;
+    }
+
+    .ads-banner {
+      background: linear-gradient(
+        135deg,
+        #4f46e5,
+        #9333ea,
+        #ec4899
+      );
+
+      padding: 10px 16px;
+
+      border-radius: 12px;
+
+      border: 1px solid rgba(255, 255, 255, 0.18);
+
+      box-shadow: 0 0 14px rgba(147, 51, 234, 0.35);
+
+      animation: adsGlow 2s infinite alternate;
+
+      color: #fff;
+
+      font-size: 13px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 6px;
+
+      flex-wrap: wrap;
+
+      text-align: center;
+    }
+
+    .ads-label {
+      font-weight: 500;
+    }
+
+    .ads-link {
+      color: #6cb6ff;
+
+      text-decoration: none;
+
+      font-weight: 700;
+
+      border-bottom: 1px solid rgba(108, 182, 255, 0.6);
+
+      text-shadow: 0 0 6px #6cb6ff;
+
+      transition: 0.25s ease;
+    }
+
+    .ads-link:hover {
+      color: #fff;
+      border-color: #fff;
+    }
+
+    .ads-text {
+      font-weight: 500;
+    }
+
+    @keyframes adsGlow {
+      from {
+        box-shadow: 0 0 8px #9333ea;
+      }
+
+      to {
+        box-shadow: 0 0 18px #ec4899;
+      }
+    }
+
+    /* =========================
+       ANIMATIONS
+    ========================= */
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .a1 {
+      animation: fadeUp 0.5s 0s both;
+    }
+
+    .a2 {
+      animation: fadeUp 0.5s 0.1s both;
+    }
+
+    .a3 {
+      animation: fadeUp 0.5s 0.2s both;
+    }
+
+    .a4 {
+      animation: fadeUp 0.5s 0.3s both;
+    }
+
+    .a5 {
+      animation: fadeUp 0.5s 0.4s both;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 480px) {
+      .main {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .trader-name {
+        font-size: 16px;
+      }
+
+      .stat-val {
+        font-size: 15px;
+      }
+
+      .ticker-item {
+        padding: 0 16px;
+      }
+
+      .ads-banner {
+        width: 100%;
+        font-size: 12px;
+      }
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="grid-bg"></div>
+
+  <!-- =========================
+       TICKER
+  ========================= -->
+
+  <div class="ticker-wrap">
+    <div class="ticker-inner" id="ticker"></div>
+  </div>
+
+  <!-- =========================
+       BG CHART
+  ========================= -->
+
+  <svg class="chart-bg" viewBox="0 0 800 200" preserveAspectRatio="none">
+
+    <polyline
+      points="0,150 50,130 100,145 150,90 200,110 250,70 300,85 350,50 400,65 450,40 500,60 550,30 600,50 650,20 700,35 750,15 800,25"
+      fill="none"
+      stroke="#00ff88"
+      stroke-width="1.5"
+    />
+
+    <polyline
+      points="0,150 50,130 100,145 150,90 200,110 250,70 300,85 350,50 400,65 450,40 500,60 550,30 600,50 650,20 700,35 750,15 800,25 800,200 0,200"
+      fill="url(#chartGrad)"
+      stroke="none"
+    />
+
+    <defs>
+      <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#00ff88" stop-opacity="0.15" />
+        <stop offset="100%" stop-color="#00ff88" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+
+  </svg>
+
+  <!-- =========================
+       MAIN
+  ========================= -->
+
+  <div class="main">
+
+    <div class="container">
+
+      <div class="panel a1">
+
+        <!-- HEADER -->
+
+        <div class="panel-header">
+
+          <span class="panel-title">
+            RADHIKA_TRADER // TERMINAL
+          </span>
+
+          <div class="panel-controls">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+          </div>
+
+        </div>
+
+        <!-- PROFILE -->
+
+        <div class="profile-block a2">
+
+          <div class="profile-inner">
+
+            <div class="avatar">
+
+              <img
+                src="./image.png"
+                alt="Radhika Trader"
+                onerror="this.outerHTML='<span>NO IMG</span>'"
+              />
+
+              <div class="avatar-corner"></div>
+
+            </div>
+
+            <div class="profile-meta">
+
+              <div class="trader-name">
+                RADHIKA <br />
+                <span>TRADER</span>
+              </div>
+
+              <div class="trader-sub">
+                MARKET INTELLIGENCE SYSTEM v2.4
+              </div>
+
+              <div class="tag-row">
+
+                <span class="tag tag-green">
+                  ⭐ PREMIUM
+                </span>
+
+                <span class="tag tag-red">
+                  <span class="blink-dot"></span>
+                  LIVE
+                </span>
+
+                <span class="tag tag-blue">
+                  100K+ MEMBERS
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- STATS -->
+
+        <div class="stats-row a3">
+
+          <div class="stat-cell">
+            <div class="stat-val">98.2%</div>
+            <div class="stat-label">Accuracy</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-val gold">100K+</div>
+            <div class="stat-label">Members</div>
+          </div>
+
+          <div class="stat-cell">
+            <div class="stat-val">24/7</div>
+            <div class="stat-label">Live Feed</div>
+          </div>
+
+        </div>
+
+        <!-- CHART -->
+
+        <div class="chart-section a3">
+
+          <div class="chart-label">
+            <span>// SIGNAL HISTORY</span>
+            <span class="up">▲ +12.4% TODAY</span>
+          </div>
+
+          <div class="candle-chart" id="candleChart"></div>
+
+        </div>
+
+        <!-- FEATURES -->
+
+        <div class="features a4">
+
+          <div class="feat-row">
+
+            <div class="feat-icon">📊</div>
+
+            <div class="feat-text">
+              <p>Expert Analysis</p>
+              <span>PROFESSIONAL MARKET INSIGHTS</span>
+            </div>
+
+            <span class="feat-arrow">▶</span>
+
+          </div>
+
+          <div class="feat-row">
+
+            <div class="feat-icon">⚡</div>
+
+            <div class="feat-text">
+              <p>Real-time Signals</p>
+              <span>LIVE MARKET UPDATES & TRENDS</span>
+            </div>
+
+            <span class="feat-arrow">▶</span>
+
+          </div>
+
+          <div class="feat-row">
+
+            <div class="feat-icon">🎯</div>
+
+            <div class="feat-text">
+              <p>Education Circle</p>
+              <span>CONNECT WITH SAVVY TRADERS</span>
+            </div>
+
+            <span class="feat-arrow">▶</span>
+
+          </div>
+
+        </div>
+
+        <!-- CTA -->
+
+        <div class="cta-block a5">
+
+          <a
+            href="https://telegram.me/+ipdkZ7kruNU5Yjc1"
+            target="_blank"
+            class="cta-btn"
+          >
+
+            <span class="cmd-prefix">$&</span>
+
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+
+            <span class="text-small">
+              JOIN STRATEGY CHANNEL
+            </span>
+
+          </a>
+
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="footer-bar">
+
+          <p>FOR EDUCATIONAL PURPOSES ONLY</p>
+
+          <p class="credit">
+            ADV BY MARKETING JASOOS
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- ADS -->
+
+<div class="ads-banner-wrap">
+
+  <div style="
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    border:1.5px solid #7c3aed;
+    border-radius:10px;
+    font-family:'Poppins',sans-serif;
+    font-size:12px;
+    color:#ffffff;
+    background:rgba(124,58,237,0.08);
+  ">
+
+    <span>🔥</span>
+
+    <span>
+      Ads by 
+
+      <a 
+        href="https://t.me/+rueXSRWaGdE4YmY1"
+        target="_blank"
+        style="
+          color:#4da6ff;
+          text-decoration:none;
+          font-weight:700;
+        "
+      >
+        ADCRAFTAGENCY
+      </a>
+
+      • Boost Your Reach 🚀
+    </span>
+
+  </div>
+
+</div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================
+       STATUS BAR
+  ========================= -->
+
+  <div class="status-bar">
+
+    <span>
+      SYS: ONLINE
+      <span class="online">●</span>
+    </span>
+
+    <span id="clock"></span>
+
+    <span>
+      NIFTY:
+      <span class="online" id="nifty">
+        22,450.35 ▲
+      </span>
+    </span>
+
+  </div>
+
+  <!-- =========================
+       SCRIPT
+  ========================= -->
+
+  <script>
+
+    /* =========================
+       CLOCK
+    ========================= */
+
+    function updateClock() {
+
+      const now = new Date();
+
+      const time = now.toLocaleTimeString("en-IN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+
+      document.getElementById("clock").textContent = time;
+    }
+
+    setInterval(updateClock, 1000);
+
+    updateClock();
+
+    /* =========================
+       TICKER DATA
+    ========================= */
+
+    const tickerData = [
+
+      {
+        sym: "NIFTY",
+        val: "22,450.35",
+        chg: "+1.24%",
+        up: true
+      },
+
+      {
+        sym: "BANKNIFTY",
+        val: "48,220.10",
+        chg: "+0.84%",
+        up: true
+      },
+
+      {
+        sym: "RELIANCE",
+        val: "2,845",
+        chg: "-0.32%",
+        up: false
+      },
+
+      {
+        sym: "BTC",
+        val: "$68,420",
+        chg: "+3.8%",
+        up: true
+      },
+
+      {
+        sym: "ETH",
+        val: "$3,220",
+        chg: "+2.2%",
+        up: true
+      },
+
+      {
+        sym: "GOLD",
+        val: "₹72,450",
+        chg: "-0.12%",
+        up: false
+      }
+
+    ];
+
+    const ticker = document.getElementById("ticker");
+
+    function buildTicker() {
+
+      let html = "";
+
+      tickerData.forEach(item => {
+
+        html += `
+          <div class="ticker-item">
+
+            <span class="ticker-sym">
+              ${item.sym}
+            </span>
+
+            <span class="ticker-val ${item.up ? "" : "down"}">
+              ${item.val}
+            </span>
+
+            <span class="ticker-chg">
+              ${item.chg}
+            </span>
+
+          </div>
+        `;
+      });
+
+      return html;
+    }
+
+    ticker.innerHTML = buildTicker() + buildTicker();
+
+    /* =========================
+       CANDLE CHART
+    ========================= */
+
+    const candleChart = document.getElementById("candleChart");
+
+    for (let i = 0; i < 24; i++) {
+
+      const bullish = Math.random() > 0.4;
+
+      const wickTop = Math.floor(Math.random() * 18) + 5;
+
+      const bodyHeight = Math.floor(Math.random() * 28) + 10;
+
+      const wickBottom = Math.floor(Math.random() * 18) + 5;
+
+      const candle = document.createElement("div");
+
+      candle.className = `candle ${bullish ? "bull" : "bear"}`;
+
+      candle.innerHTML = `
+        <div class="wick" style="height:${wickTop}px"></div>
+
+        <div class="body" style="height:${bodyHeight}px"></div>
+
+        <div class="wick" style="height:${wickBottom}px"></div>
+      `;
+
+      candleChart.appendChild(candle);
+    }
+
+    /* =========================
+       NIFTY RANDOM UPDATE
+    ========================= */
+
+    const nifty = document.getElementById("nifty");
+
+    setInterval(() => {
+
+      const base = 22450;
+
+      const random = (Math.random() * 100).toFixed(2);
+
+      const final = (base + Number(random)).toLocaleString();
+
+      nifty.innerHTML = `${final} ▲`;
+
+    }, 4000);
+
+  </script>
+
+</body>
+
+</html>
